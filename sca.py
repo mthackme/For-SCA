@@ -99,22 +99,22 @@ class MavenDependency:
     def save_to_csv(self, filename="testingmo.csv"):     
 
         print(f"SHA1: {self.sha1_checksum}")
-        # print(f"Group ID: {self.group_id}")
-        # print(f"Artifact ID: {self.artifact_id}")
-        # print(f"License: {self.license}")
-        # print(f"Current Version: {self.current_version}")
-        # print(f"Current Version Published Date: {self.current_version_datetime}")
-        # print(f"Current version age(years): {self.current_version_age} years")
-        # print(f"Latest version: {self.latest_version}")
-        # print(f"Latest version Published Date: {self.latest_version_datetime}")
-        # print(f"Latest version Age(years): {self.latest_version_age} years")
-        # print(f"EOL: {self.eol}")
+        print(f"Group ID: {self.group_id}")
+        print(f"Artifact ID: {self.artifact_id}")
+        print(f"License: {self.license}")
+        print(f"Current Version: {self.current_version}")
+        print(f"Current Version Published Date: {self.current_version_datetime}")
+        print(f"Current version age(years): {self.current_version_age} years")
+        print(f"Latest version: {self.latest_version}")
+        print(f"Latest version Published Date: {self.latest_version_datetime}")
+        print(f"Latest version Age(years): {self.latest_version_age} years")
+        print(f"EOL: {self.eol}")
         print(f"Vulnerabilities of Current Version: {', '.join(self.current_version_cve)}")
         print(f"Severity of Current Version: {', '.join(self.current_version_severity)}")
         print(f"Vulnerabilities in Latest Version: {self.latest_version_cve}")
         print(f"Severity of Latest Version: {self.latest_version_severity}")
-        # print(f"References: {self.reference}")
-        # print(f"Recomendations: {self.recommendation}")
+        print(f"References: {self.reference}")
+        print(f"Recomendations: {self.recommendation}")
 
         if self.numFound == 1:
             data = {
@@ -256,7 +256,7 @@ if __name__ == '__main__':
     
     for sha1 in sha1list:
         
-        #     ### call all method
+        ### call all method ###
         dependency = MavenDependency(sha1)
         dependency.fetch_metadata()
         dependency.fetch_latest_version()
@@ -264,5 +264,3 @@ if __name__ == '__main__':
         dependency.current_version_severity.append(severity)
         dependency.get_cve_severity()
         dependency.save_to_csv()
-        # #dependency.printCVE()
-
