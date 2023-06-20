@@ -92,7 +92,7 @@ class MavenDependency:
             latest_version_age_months = (latest_time_diff.days % 365) // 30
             self.latest_version_age = latest_version_age_years + (latest_version_age_months / 10)
 
-    def save_to_csv(self, filename="testingmo.csv"):     
+    def save_to_csv(self, filename="SCA.csv"):     
 
         print(f"SHA1: {self.sha1_checksum}")
         print(f"Group ID: {self.group_id}")
@@ -177,7 +177,6 @@ class MavenDependency:
 
             # Replace with the URL you want to request
             url = f'https://security.snyk.io/package/maven/{self.group_id}:{self.artifact_id}/{self.latest_version}'
-            print(url)
             value_list = get_value_from_html(url)
             cve_list = []
             for value in value_list:
