@@ -42,6 +42,7 @@ class MavenDependency:
 
         if self.numFound == 1:
 
+            ## Getting information from the API ##
             self.group_id = root.find(".//str[@name='g']").text
             self.artifact_id = root.find(".//str[@name='a']").text
             self.current_version = root.find(".//str[@name='v']").text
@@ -70,9 +71,6 @@ class MavenDependency:
             response = requests.get(url)
             root = ET.fromstring(response.content)
 
-            #print(url)
-            #print(self.group_id)
-
             if root.find('.//versioning/latest'):
             
                 self.latest_version = root.find('.//versioning/latest').text
@@ -81,8 +79,6 @@ class MavenDependency:
                 
                 latest_version_last = root.find('.//versioning/versions')
                 self.latest_version = latest_version_last[-1].text
-                
-            #print(self.latest_version)
 
             self.latest_version_timestamp = root.find('.//versioning/lastUpdated').text
             self.latest_version_datetime = datetime.datetime.strptime(self.latest_version_timestamp, '%Y%m%d%H%M%S')
@@ -121,9 +117,7 @@ class MavenDependency:
                 'SHA1': self.sha1_checksum, 'Group ID': self.group_id, 'Artifact ID': self.artifact_id, 'License': '', 'Current Version': self.current_version, 'Current Version Published Date': self.current_version_datetime, 'Current Version Age (years)': f"{self.current_version_age} years", 'Latest Version': self.latest_version, 'Latest Version Published Date': self.latest_version_datetime, 'Latest Version Age (years)': f"{self.latest_version_age} years", 'Vulnerabilities of Current Version': f"{self.current_version_cve}", 'Severity of Current Version': f"{self.current_version_severity}", 'Vulnerabilities in Latest Version': f"{self.latest_version_cve}", 'Severity of Latest Version': f"{self.latest_version_severity}", 'References': f"{self.reference}", 'Recomendations': f"{self.recommendation}"}
 
             with open(filename, 'a', newline='') as csvfile:
-                # fieldnames = data.keys()
                 writer = csv.DictWriter(csvfile, fieldnames=headerList)
-                # writer.writeheader()
                 writer.writerow(data)
 
         else:
@@ -131,9 +125,7 @@ class MavenDependency:
                 'SHA1': self.sha1_checksum, 'Group ID': 'None', 'Artifact ID': 'None', 'License': 'None', 'Current Version': 'None', 'Current Version Published Date': 'None', 'Current Version Age (years)': 'None', 'Latest Version': 'None', 'Latest Version Published Date': 'None', 'Latest Version Age (years)': 'None', 'Vulnerabilities of Current Version': 'None', 'Severity of Current Version': 'None', 'Vulnerabilities in Latest Version': 'None', 'Severity of Latest Version': 'None', 'References': 'None', 'Recomendations': 'None'}
 
             with open(filename, 'a', newline='') as csvfile:
-                # fieldnames = data.keys()
                 writer = csv.DictWriter(csvfile, fieldnames=headerList)
-                # writer.writeheader()
                 writer.writerow(data)
     
 
@@ -151,7 +143,6 @@ class MavenDependency:
                         if href_element and 'href' in href_element.attrs:
                             href_value = href_element['href']
                             href_value_list.append(href_value)
-                            # print(href_value)
                 return href_value_list
 
             def get_cve_from_html(cveresponse):
@@ -161,7 +152,6 @@ class MavenDependency:
                     if cveid_element:
                         cveid_value = cveid_element['id']
                         self.latest_version_cve = cveid_value
-                        # print(self.latest_version_cve)
                         return cveid_value
                 return None
 
@@ -171,7 +161,6 @@ class MavenDependency:
                     severity_element = sevsoup.find('span', class_='vue--badge__text')
                     if severity_element:
                         severity_value_snyk = severity_element.text
-                        # print(severity_value_snyk)
                         return severity_value_snyk
                     return None
                 
@@ -181,7 +170,6 @@ class MavenDependency:
                     severity_element = sevsoup.find('a', id='Cvss3NistCalculatorAnchor')
                     if severity_element:
                         severity_value_nvd = severity_element.text
-                        # print(severity_value_nvd)
                         self.latest_version_severity = severity_value_nvd
                         return severity_value_nvd
                     return None
@@ -201,14 +189,10 @@ class MavenDependency:
                     url2 = 'https://nvd.nist.gov/vuln/detail/' + cvevalue
                     nvdresponse = requests.get(url2)
                     severity_nvd = get_severity_from_nvd(nvdresponse)
-                    # print(severity_nvd)
-                    ##get severity from NVD##
 
                 else:
                     cve_list.append(value)
                     severity_value = get_severity_from_snyk(serveresponse).strip()
-                    # print(severity_value)
-                    ##get severity from snyk##
                            
 
 if __name__ == '__main__':
@@ -218,7 +202,6 @@ if __name__ == '__main__':
     headerList = ['SHA1', 'Group ID', 'Artifact ID', 'License', 'Current Version', 'Current Version Published Date', 'Current Version Age (years)', 'Latest Version', 'Latest Version Published Date', 'Latest Version Age (years)', 'Vulnerabilities of Current Version', 'Severity of Current Version', 'Vulnerabilities in Latest Version', 'Severity of Latest Version', 'References', 'Recomendations']
         
     with open(filename, 'w', newline='') as csvfile:
-        # fieldnames = data.keys()
         writer = csv.DictWriter(csvfile, fieldnames=headerList)
         writer.writeheader()
 
@@ -243,7 +226,6 @@ if __name__ == '__main__':
                 vulnlist = vulns.findall("{*}vulnerability")
         else:
                 vulnlist = []
-                # print("No VUlnerability Found")
 
         for vuln in vulnlist:
             nameElement = vuln.find("{*}name")
@@ -251,12 +233,10 @@ if __name__ == '__main__':
             severityElement = vuln.find("{*}severity")
             severity = severityElement.text if severityElement is not None else None
             cve_entry = f"CVE: {nameVuln}, SEVERITY: {severity}"
-
-        # print(f"CVE:{nameVuln}, Severity: {severity}")
     
     for sha1 in sha1list:
         
-        ### call all method ###
+        ## call all method ##
         dependency = MavenDependency(sha1)
         dependency.fetch_metadata()
         dependency.fetch_latest_version()
